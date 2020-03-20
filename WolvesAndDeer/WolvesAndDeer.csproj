@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetName).dll&quot; &quot;C:\Users\Nikolay\source\repos\osmlifesimulation\OSMLS\bin\Debug\netcoreapp2.1\modules&quot; /Y /I" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetName).dll&quot; &quot;C:\Users\Kolyamba\source\repos\osmlifesimulation\OSMLS\bin\Debug\netcoreapp2.1\modules&quot; /Y /I" />
   </Target>
 
 </Project>
