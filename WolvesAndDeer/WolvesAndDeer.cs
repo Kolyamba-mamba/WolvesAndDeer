@@ -9,11 +9,11 @@ namespace WolvesAndDeer
 {
     public class WolvesAndDeer : OSMLSModule
     {
-        private Polygon wildLand;
-        private List<Deer> deers;
-        private List<Wolf> wolfs;
-        private Wolf wolf;
-        private Deer deer;
+        private Polygon _wildLand;
+        private static List<Deer> _deers;
+        private static List<Wolf> _wolfs;
+        private Wolf _wolf;
+        private Deer _deer;
         Random rnd = new Random();
         
         protected override void Initialize()
@@ -28,35 +28,38 @@ namespace WolvesAndDeer
                 new Coordinate(6625000, 8710000),
             };
 
-            wildLand = new Polygon(new LinearRing(wildLandCoordinates));
-            MapObjects.Add(wildLand);
+            _wildLand = new Polygon(new LinearRing(wildLandCoordinates));
+            MapObjects.Add(_wildLand);
             
             //Спаун оленей
-            deers = new List<Deer>();
-            foreach (var coordinate in GenerateCoordinatesAnimal(10))
+            _deers = new List<Deer>();
+            foreach (var coordinate in GenerateCoordinatesAnimal(30))
             {
-                var speedX = rnd.Next(-150, 150);
-                var speedY = rnd.Next(-150, 150); 
-                deer = new Deer(coordinate, speedX, speedY);
-                deers.Add(deer);
-                MapObjects.Add(deer);
+                var speedX = rnd.Next(-50, 50);
+                var speedY = rnd.Next(-50, 50); 
+                _deer = new Deer(coordinate, speedX, speedY);
+                _deers.Add(_deer);
+                MapObjects.Add(_deer);
             }
             
             //Спаун волков
-            wolfs = new List<Wolf>();
+            _wolfs = new List<Wolf>();
             foreach (var coordinate in GenerateCoordinatesAnimal(15))
             {
-                wolf = new Wolf(coordinate);
-                wolfs.Add(wolf);
-                MapObjects.Add(wolf);
+                _wolf = new Wolf(coordinate);
+                _wolfs.Add(_wolf);
+                MapObjects.Add(_wolf);
             }
         }
-
         public override void Update(long elapsedMilliseconds)
         {
             var deers = MapObjects.GetAll<Deer>();
             foreach (var deer in deers)
             {
+                if (deer.Coordinate.X < 6625000 - 50) deer._speedX = rnd.Next(0, 50);
+                else if (deer.Coordinate.X > 7000000 - 50) deer._speedX = rnd.Next(-50, 0);
+                else if (deer.Coordinate.Y < 8710000 - 50) deer._speedY = rnd.Next(0, 50);
+                else if (deer.Coordinate.Y > 9000000 - 50) deer._speedY = rnd.Next(-50, 0);
                 deer.MoveUpRight();   
             }
         }
@@ -91,8 +94,8 @@ namespace WolvesAndDeer
         ")]
         public class Deer : Point
         {
-            public double _speedX { get; }
-            public double _speedY { get; }
+            public double _speedX { get; set; }
+            public double _speedY { get; set; }
 
             public Deer (Coordinate coordinate, double speedX, double speedY) : base(coordinate)
             {
