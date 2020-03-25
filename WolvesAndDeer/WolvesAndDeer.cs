@@ -17,8 +17,6 @@ namespace WolvesAndDeer
         private readonly int _wolfSpeed = 15;
         private readonly int _deerSeed = 10;
         private Polygon _wildLand;
-        private Wolf _wolf;
-        private Deer _deer;
         Random rnd = new Random();
 
         protected override void Initialize()
@@ -39,17 +37,11 @@ namespace WolvesAndDeer
 
             //Спаун оленей
             foreach (var coordinate in GenerateCoordinatesAnimal(200))
-            {
-                _deer = new Deer(coordinate, _deerSeed);
-                MapObjects.Add(_deer);
-            }
-
+                MapObjects.Add(new Deer(coordinate, _deerSeed));
+            
             //Спаун волков
-            foreach (var coordinate in GenerateCoordinatesAnimal(350))
-            {
-                _wolf = new Wolf(coordinate, _wolfSpeed);
-                MapObjects.Add(_wolf);
-            }
+            foreach (var coordinate in GenerateCoordinatesAnimal(300))
+                MapObjects.Add(new Wolf(coordinate, _wolfSpeed));
         }
 
         public override void Update(long elapsedMilliseconds)
@@ -74,6 +66,30 @@ namespace WolvesAndDeer
                     PointExtension.Distance((Point) wolf, (Point) deer1) < PointExtension.Distance((Point) wolf, (Point) deer2) ? deer1 : deer2);
                 wolf.MoveUpRight(new Coordinate(nearestDeer.X, nearestDeer.Y));
 
+                //Ищем ближайшего волка
+                var minDistance = double.MaxValue;
+                foreach (var _wolf in wolves.Where(_wolf => 
+                    (PointExtension.Distance((Point) wolf, (Point)_wolf) < minDistance) && 
+                    (PointExtension.Distance((Point) wolf, (Point) _wolf) > 0)))
+                {
+                    minDistance = (PointExtension.Distance((Point) wolf, (Point) _wolf));
+                }
+     
+                if (minDistance < 250)
+                {
+                    if (wolf._flagPack == false)
+                    {
+                        Console.WriteLine(minDistance);
+                        wolf.WolfInThePack();
+                        wolf._flagPack = true;
+                    }
+                } 
+                else
+                {
+                    wolf._speed = _wolfSpeed;
+                    wolf._flagPack = false;
+                }
+                
                 if (!wolf.CanEat(nearestDeer)) continue;
                 MapObjects.Remove(nearestDeer);
                 deers.Remove(nearestDeer);
@@ -161,10 +177,12 @@ namespace WolvesAndDeer
     ")]
     public class Wolf : Point
     {
-        public double _speed { get; }
+        public double _speed { get; set; }
+        public bool _flagPack { get; set; }
         public Wolf (Coordinate coordinate, double speed) : base(coordinate)
         {
             _speed = speed;
+            _flagPack = false;
         }
         public void MoveUpRight(Coordinate direction)
         {
@@ -174,6 +192,11 @@ namespace WolvesAndDeer
         public bool CanEat(Deer deer)
         {
             return PointExtension.Distance(this, deer) < _speed;
+        }
+
+        public void WolfInThePack()
+        {
+            _speed += 5;
         }
     }
 }
